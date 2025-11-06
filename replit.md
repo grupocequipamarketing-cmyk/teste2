@@ -72,6 +72,9 @@ npm run dev
   - Fixed AgentView black screen by adding state management (history, chatHistories, handlers)
   - Fixed VideoPlayerView black screen by correcting prop name (video → initialVideo)
   - Implemented comments functionality in CommunityView with full UI and state management
+  - Added OpenAI integration with GPT-4o chat agent
+  - Implemented video progress persistence using localStorage
+  - Now features dual AI chat: Google Gemini and OpenAI GPT
 
 ## Notes
 - This app was imported from AI Studio (https://ai.studio/apps/drive/16b5ElGbSprtdan1jbs4RNGAE78kxil0q)

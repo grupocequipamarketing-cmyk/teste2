@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChatBubbleIcon, SparklesIcon, ArrowLeftIcon, LightbulbIcon, VideoCameraIcon, ReplicateIcon } from './icons';
 import GeminiChatAgent from './agents/GeminiChatAgent';
+import OpenAIChatAgent from './agents/OpenAIChatAgent';
 import ImageGenerationAgent from './agents/ImageGenerationAgent';
 import PromptSpecialistAgent from './agents/PromptSpecialistAgent';
 import VideoGenerationAgent from './agents/VideoGenerationAgent';
@@ -27,7 +28,7 @@ type AgentComponentProps = {
 };
 
 interface Agent {
-    id: AgentId | 'chat';
+    id: AgentId | 'chat' | 'openai-chat';
     title: string;
     description: string;
     icon: React.FC<{className?: string}>;
@@ -38,9 +39,16 @@ const agents: Agent[] = [
     { 
         id: 'chat',
         title: "Chat com Gemini", 
-        description: "Converse com um agente de IA para tirar dúvidas, gerar ideias e muito mais.",
+        description: "Converse com o Google Gemini para tirar dúvidas, gerar ideias e muito mais.",
         icon: ChatBubbleIcon,
         component: GeminiChatAgent
+    },
+    { 
+        id: 'openai-chat',
+        title: "Chat com GPT", 
+        description: "Converse com o GPT da OpenAI, o modelo mais avançado para conversas e análises.",
+        icon: ChatBubbleIcon,
+        component: OpenAIChatAgent
     },
     {
         id: 'imageReplicator',
@@ -88,9 +96,9 @@ const AgentCard: React.FC<{ agent: Agent; onSelect: () => void }> = ({ agent, on
 );
 
 const AgentView: React.FC<AgentViewProps> = (props) => {
-    const [activeAgent, setActiveAgent] = useState<AgentId | 'chat' | null>(null);
+    const [activeAgent, setActiveAgent] = useState<AgentId | 'chat' | 'openai-chat' | null>(null);
 
-    const handleSelectAgent = (id: AgentId | 'chat') => {
+    const handleSelectAgent = (id: AgentId | 'chat' | 'openai-chat') => {
         setActiveAgent(id);
     };
 

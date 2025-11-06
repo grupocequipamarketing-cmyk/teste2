@@ -12,42 +12,33 @@ interface VideoPlayerViewProps {
 const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({ initialVideo, playlist, onBack }) => {
   const [currentVideo, setCurrentVideo] = useState(initialVideo);
   const [completedVideos, setCompletedVideos] = useState<Set<number>>(new Set());
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setCurrentVideo(initialVideo);
   }, [initialVideo]);
 
   useEffect(() => {
-    loadProgress();
-  }, [playlist]);
-
-  const loadProgress = async () => {
-    setLoading(false);
-  };
-
-  const handleToggleComplete = async (videoId: number) => {
-    const isCompleted = !completedVideos.has(videoId);
-    
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      await axios.post(`/api/lessons/${videoId}/complete`, 
-        { completed: isCompleted },
-        { headers: { Authorization: `Bearer ${token}` }}
-      );
-
-      const newCompleted = new Set(completedVideos);
-      if (isCompleted) {
-        newCompleted.add(videoId);
-      } else {
-        newCompleted.delete(videoId);
+    const saved = localStorage.getItem('video_progress');
+    if (saved) {
+      try {
+        const progress = JSON.parse(saved);
+        setCompletedVideos(new Set(progress));
+      } catch (e) {
+        console.error('Failed to load progress:', e);
       }
-      setCompletedVideos(newCompleted);
-    } catch (error) {
-      console.error('Failed to save progress:', error);
     }
+  }, []);
+
+  const handleToggleComplete = (videoId: number) => {
+    const newCompleted = new Set(completedVideos);
+    if (newCompleted.has(videoId)) {
+      newCompleted.delete(videoId);
+    } else {
+      newCompleted.add(videoId);
+    }
+    setCompletedVideos(newCompleted);
+    
+    localStorage.setItem('video_progress', JSON.stringify(Array.from(newCompleted)));
   };
   
   const isCurrentVideoCompleted = completedVideos.has(currentVideo.id);

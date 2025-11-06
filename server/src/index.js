@@ -299,6 +299,27 @@ app.post('/api/chat/history', verifyToken, checkSubscription(db), (req, res) => 
   res.json({ id: result.lastInsertRowid });
 });
 
+app.post('/api/ai/openai-chat', verifyToken, checkSubscription(db), async (req, res) => {
+  try {
+    const { messages } = req.body;
+    
+    const { default: OpenAI } = await import('openai');
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: messages,
+      max_tokens: 2000
+    });
+
+    const assistantMessage = response.choices[0].message.content;
+    res.json({ message: assistantMessage });
+  } catch (error) {
+    console.error('OpenAI Chat error:', error);
+    res.status(500).json({ error: 'Failed to get response from OpenAI' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Backend ready to accept connections`);
