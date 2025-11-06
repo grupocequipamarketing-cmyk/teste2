@@ -7,7 +7,7 @@ import { generateToken, verifyToken, requireAdmin, checkSubscription } from './a
 const app = express();
 const PORT = 3000;
 
-const ADMIN_EMAILS = ['admin@r4academy.com', 'seu@email.com'];
+const ADMIN_EMAILS = ['admin@r4academy.com', 'seu@email.com', 'teste@gmail.com'];
 const CAKTO_WEBHOOK_SECRET = process.env.CAKTO_WEBHOOK_SECRET || 'change-this-secret';
 
 app.use(cors());

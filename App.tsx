@@ -12,7 +12,7 @@ import AdminView from './components/AdminView';
 import LandingPage from './components/LandingPage';
 import LoginSignup from './components/Auth/LoginSignup';
 import SubscriptionPaywall from './components/SubscriptionPaywall';
-import type { ViewType, Video, AgentType } from './types';
+import type { ViewType, Video, AgentType, HistoryItem, ChatHistory } from './types';
 
 function App() {
   const { user, loading: authLoading } = useAuth();
@@ -22,6 +22,10 @@ function App() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [currentView, setCurrentView] = useState<ViewType>('conteudo');
   const [selectedCourse, setSelectedCourse] = useState<{ video: Video; playlist: Video[] } | null>(null);
+  
+  // Agent state
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
 
   if (authLoading) {
     return (
@@ -51,10 +55,47 @@ function App() {
     setSelectedCourse(null);
   };
 
+  // Agent history functions
+  const addToHistory = (item: Omit<HistoryItem, 'id' | 'timestamp'>) => {
+    const newItem: HistoryItem = {
+      ...item,
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+    };
+    setHistory(prev => [newItem, ...prev]);
+  };
+
+  const deleteHistoryItem = (id: number) => {
+    setHistory(prev => prev.filter(item => item.id !== id));
+  };
+
+  const clearAgentHistory = (agentType: AgentType) => {
+    setHistory(prev => prev.filter(item => item.agentType !== agentType));
+  };
+
+  // Chat history functions
+  const saveChatHistory = (chat: ChatHistory) => {
+    setChatHistories(prev => {
+      const existing = prev.find(c => c.id === chat.id);
+      if (existing) {
+        return prev.map(c => c.id === chat.id ? chat : c);
+      }
+      return [chat, ...prev];
+    });
+  };
+
+  const deleteChatHistory = (id: number) => {
+    setChatHistories(prev => prev.filter(chat => chat.id !== id));
+  };
+
+  const clearAllChatHistory = () => {
+    setChatHistories([]);
+  };
+
   const renderContent = () => {
     if (selectedCourse) {
       return <VideoPlayerView 
-        video={selectedCourse.video} 
+        initialVideo={selectedCourse.video} 
         playlist={selectedCourse.playlist}
         onBack={() => setSelectedCourse(null)}
       />;
@@ -62,7 +103,16 @@ function App() {
 
     switch (currentView) {
       case 'agentes':
-        return <AgentView />;
+        return <AgentView 
+          history={history}
+          addToHistory={addToHistory}
+          deleteHistoryItem={deleteHistoryItem}
+          clearAgentHistory={clearAgentHistory}
+          chatHistories={chatHistories}
+          saveChatHistory={saveChatHistory}
+          deleteChatHistory={deleteChatHistory}
+          clearAllChatHistory={clearAllChatHistory}
+        />;
       case 'conteudo':
         if (coursesLoading) {
           return (

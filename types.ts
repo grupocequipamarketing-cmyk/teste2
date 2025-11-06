@@ -40,6 +40,14 @@ export interface ChatHistory {
   messages: ChatMessage[];
 }
 
+export interface Comment {
+    id: number;
+    author: string;
+    avatar: string;
+    content: string;
+    time: string;
+}
+
 export interface Post {
     id: number;
     author: string;
@@ -50,4 +58,5 @@ export interface Post {
     likes: number;
     liked: boolean;
     pinned?: boolean;
+    comments?: Comment[];
 }
