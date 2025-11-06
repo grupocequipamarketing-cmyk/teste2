@@ -100,30 +100,44 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(`[Login] Attempt for email: ${email}`);
 
     const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
     if (!user) {
+      console.log(`[Login] User not found: ${email}`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const validPassword = await bcrypt.compare(password, user.password_hash);
     if (!validPassword) {
+      console.log(`[Login] Invalid password for: ${email}`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const token = generateToken(user);
     const { password_hash, ...userWithoutPassword } = user;
-
+    
+    console.log(`[Login] Success for user ${user.id} (${email})`);
     res.json({ user: userWithoutPassword, token });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('[Login] Error:', error);
     res.status(500).json({ error: 'Login failed' });
   }
 });
 
 app.get('/api/auth/me', verifyToken, (req, res) => {
-  const user = db.prepare('SELECT id, name, email, role FROM users WHERE id = ?').get(req.user.id);
-  res.json({ user });
+  try {
+    const user = db.prepare('SELECT id, name, email, role FROM users WHERE id = ?').get(req.user.id);
+    if (!user) {
+      console.log(`[Auth/Me] User not found in database: ${req.user.id}`);
+      return res.status(404).json({ error: 'User not found' });
+    }
+    console.log(`[Auth/Me] Returning user data for ${user.id} (${user.email})`);
+    res.json({ user });
+  } catch (error) {
+    console.error('[Auth/Me] Error:', error);
+    res.status(500).json({ error: 'Failed to get user data' });
+  }
 });
 
 app.get('/api/profile', verifyToken, (req, res) => {
