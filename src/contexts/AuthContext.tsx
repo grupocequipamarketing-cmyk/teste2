@@ -27,14 +27,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (token) {
-      console.log('[AuthContext] Verifying token...');
       api.get('/auth/me')
         .then((res) => {
-          console.log('[AuthContext] User verified:', res.data.user);
           setUser(res.data.user);
         })
         .catch((error) => {
-          console.log('[AuthContext] Token verification failed:', error.response?.status, error.message);
           localStorage.removeItem('token');
           setToken(null);
           setUser(null);
@@ -46,20 +43,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [token]);
 
   const login = async (email: string, password: string) => {
-    console.log('[AuthContext] Login attempt for:', email);
     const response = await api.post('/auth/login', { email, password });
     const { user, token } = response.data;
-    console.log('[AuthContext] Login successful, setting token and user');
     localStorage.setItem('token', token);
     setToken(token);
     setUser(user);
   };
 
   const register = async (name: string, email: string, password: string) => {
-    console.log('[AuthContext] Register attempt for:', email);
     const response = await api.post('/auth/register', { name, email, password });
     const { user, token } = response.data;
-    console.log('[AuthContext] Registration successful, setting token and user');
     localStorage.setItem('token', token);
     setToken(token);
     setUser(user);

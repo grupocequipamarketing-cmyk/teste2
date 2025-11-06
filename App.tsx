@@ -20,7 +20,7 @@ function App() {
   const { courses, loading: coursesLoading, error: coursesError } = useCourses({ enabled: !!user });
   const [showLogin, setShowLogin] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [currentView, setCurrentView] = useState<ViewType>('content');
+  const [currentView, setCurrentView] = useState<ViewType>('conteudo');
   const [selectedAgent, setSelectedAgent] = useState<AgentType | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<{ video: Video; playlist: Video[] } | null>(null);
 
@@ -50,7 +50,7 @@ function App() {
       return;
     }
     setSelectedAgent(agent);
-    setCurrentView('agents');
+    setCurrentView('agentes');
   };
 
   const handleViewChange = (view: ViewType) => {
@@ -72,7 +72,7 @@ function App() {
     }
 
     switch (currentView) {
-      case 'agents':
+      case 'agentes':
         return selectedAgent ? (
           <AgentView 
             agentType={selectedAgent}
@@ -84,7 +84,7 @@ function App() {
             <p className="text-gray-400">Escolha um agente no menu lateral</p>
           </div>
         );
-      case 'content':
+      case 'conteudo':
         if (coursesLoading) {
           return (
             <div className="flex items-center justify-center h-full">
@@ -105,7 +105,7 @@ function App() {
           );
         }
         return <ContentView courses={courses} onVideoSelect={(video, playlist) => setSelectedCourse({ video, playlist })} />;
-      case 'community':
+      case 'comunidade':
         return <CommunityView />;
       case 'admin':
         return user.role === 'admin' ? <AdminView /> : <div>Acesso negado</div>;
